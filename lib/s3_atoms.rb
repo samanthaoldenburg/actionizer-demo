@@ -5,18 +5,24 @@ class S3Atoms
     required :bucket, type: Aws::S3::Bucket
   }
 
-  def get
-    fail_with_context! error: :does_not_exist unless s3_object.exist?
-
-    s3_object.get.body.read
-  end
-
   inputs_for(:write) {
     required :key, type: String
     required :value, type: String
     required :bucket, type: Aws::S3::Bucket
     optional :allow_overwrite
   }
+
+  inputs_for(:delete) {
+    required :key, type: String
+    required :content_hash, type: String
+    required :bucket, type: Aws::S3::Bucket
+  }
+
+  def get
+    fail_with_context! error: :does_not_exist unless s3_object.exist?
+
+    s3_object.get.body.read
+  end
 
   def write
     if s3_object.exist? && !allow_overwrite?
@@ -25,12 +31,6 @@ class S3Atoms
 
     s3_object.put(input.value)
   end
-
-  inputs_for(:delete) {
-    required :key, type: String
-    required :content_hash, type: String
-    required :bucket, type: Aws::S3::Bucket
-  }
 
   def delete
     contents = get
