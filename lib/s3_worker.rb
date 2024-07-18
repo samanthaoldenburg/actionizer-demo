@@ -22,7 +22,7 @@ class EnsureFileDeletionWorker
 
     return Log.info("File is deleted") if result.success?
 
-    attempt_retry!(result, args) if result.error == :timeout
+    attempt_retry!(result, args) if result.error == :s3_timeout
 
     raise_deletion_failure!(result)
   end
